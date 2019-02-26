@@ -1,0 +1,52 @@
+<meta charset="UTF-8">
+<script src="../lib/fx.js"></script>
+
+## 결과를 만드는 함수 reduce, take
+
+### reduce
+
+<script>
+    const L = {};
+    L.entries = function *(obj) {
+        for (const k in obj) yield [k, obj[k]];
+    };
+
+    const join = curry((sep = ',', iter) =>
+        reduce((a, b) => `${a}${sep}${b}`, iter));
+
+    const queryStr = pipe(
+        L.entries,
+        map(([k, v]) => `${k}=${v}`),
+        join('&'));
+
+    log(queryStr({ limit: 10, offset: 10, type: 'notice' }));
+</script>
+
+### take, find
+
+<script>
+    const users = [
+        { age: 32 },
+        { age: 31 },
+        { age: 37 },
+        { age: 28 },
+        { age: 25 },
+        { age: 32 },
+        { age: 32 },
+        { age: 37 },
+    ];
+
+    const find = curry((f, iter) => go(
+        iter,
+        filter(f),
+        take(1),
+        ([a]) => a
+    ));
+
+    log(find(u => u.age < 30, users));
+
+    go(users,
+        map((a) => a.age),
+        find((a) => a < 30),
+        log);
+</script>
